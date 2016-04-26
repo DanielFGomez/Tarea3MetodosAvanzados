@@ -6,10 +6,15 @@
 #define G 4.492E-3
 
 void generar(int N,double R,double *r, double *v);
+
 void imprime(FILE *f,int N,double *r,double *v);
+
 double calcular_masa(double radio2, double *r, double m, int N);
+
 void calcular_cm(double *r, int N, double* Rcm);
+
 void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon);
+
 void leap_frog_step(double *r, double *v, double *a, double dt, int N);
 
 
@@ -21,6 +26,10 @@ int main(int arg, char **argc){
   double R=pow(N,1/3.0); //en Parsec
   double M=1.0; //masa solar
   double *Rcm;
+  double rho=N/(4*PI*pow(R,3)/3);
+  double rhoe=1/(4*PI*pow(epsilon,3)/3);
+  double T=1/pow(rho*G,0.5);
+  double dt=N/pow(rhoe*G,0.5);
   
   
   printf("\nParametro N=%d \n",N);
