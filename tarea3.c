@@ -14,9 +14,7 @@ double calcular_masa(double radio2, double *r, double m, int N);
 void calcular_cm(double *r, int N, double* Rcm);
 
 void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon);
-
-void leap_frog_step(double *r, double *v, double *a, double dt, int N);
-
+void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, double *a, double dt, int N);
 
 int main(int arg, char **argc){
 
@@ -61,6 +59,14 @@ int main(int arg, char **argc){
   
   calcular_cm(r, N, Rcm);
   printf("Rcm x= %f y= %f z= %f \n",Rcm[0],Rcm[1],Rcm[2]);
+ 
+
+  for(i=1;i*dt<T;i++){
+    
+    leap_frog_step(Rcm,M,epsilon,r, v, a, dt, N);
+
+  }
+  
   
 
   
@@ -173,8 +179,11 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
   
 }
 
-void leap_frog_step(double *r, double *v, double *a, double dt, int N){
+void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, double *a, double dt, int N){
   int i;
+  //PRIMERA ACELERACION
+
+  calcular_a(a,r, Rcm, N, m,epsilon);
 //kick
   for (i=0;1<N;i++){
     v[i]=v[i]+0.5*a[i]*dt;
@@ -188,6 +197,9 @@ void leap_frog_step(double *r, double *v, double *a, double dt, int N){
     r[i+2*N]=r[i+2*N]+v[i+2*N]*dt;
   }
   //kick
+
+ calcular_a(a,r, Rcm, N, m,epsilon);
+
  for (i=0;1<N;i++){
     v[i]=v[i]+0.5*a[i]*dt;
     v[i+N]=v[i+N]+0.5*a[i+N]*dt;
