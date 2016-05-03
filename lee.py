@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 if(len(sys.argv)!=3):
-    print "introduzca 2 parametros para correr el programa\n"
-    print "parametros dados=", len(sys.argv)-1
+    print "Introduzca 2 archivos para correr el programa\n"
+    print "Numero de parametros dados =", len(sys.argv)-1
     
     exit()
     
@@ -28,31 +28,23 @@ except IOError:
    print "Error: el archivo "+lectura+ " no existe"
    exit()
 
-x1=[]
-y1=[]
-z1=[]
+r1=[]
+
 
 x2=[]
 y2=[]
 z2=[]
 
-Rmax=0
-contador=0
+
+
 for i in range(int(len(archivo1)-1)):
     a= archivo1[i].split()
-    x1.append(a[0])
-    y1.append(a[1])
-    z1.append(a[2])
-    contador+=1
-    r=(float(a[0])**2+float(a[1])**2+float(a[2])**2)**0.5
-    if(r>=Rmax):
-        Rmax=r
+    if(i==0):
+        Radio=(float(a[0])**2+float(a[1])**2+float(a[2])**2)**0.5
+    
+    r1.append((float(a[0])**2+float(a[1])**2+float(a[2])**2)**0.5-Radio)
+    r1.sort()
 
-print "Numero de objetos ", contador, ", Radio maximo=", Rmax, "\n"
+plt.hist(r1)
 
-'''
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(x1,y1,z1)
 plt.show()
-'''
