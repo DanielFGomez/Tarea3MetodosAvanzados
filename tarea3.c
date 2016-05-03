@@ -205,8 +205,8 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
     RADIO=(r[i]-Rcm[0])*(r[i]-Rcm[0])+(r[i+N]-Rcm[1])*(r[i+N]-Rcm[1])+(r[i+2*N]-Rcm[2])*(r[i+2*N]-Rcm[2]);
 
     a[i]=-G*(r[i]-Rcm[0])*M/pow(RADIO + epsilon*epsilon,1.5);
-    a[i+N]=-G*(r[i]-Rcm[0])*M/pow(RADIO + epsilon*epsilon,1.5);
-    a[i+2*N]=-G*(r[i]-Rcm[0])*M/pow(RADIO + epsilon*epsilon,1.5);
+    a[i+N]=-G*(r[i+N]-Rcm[1])*M/pow(RADIO + epsilon*epsilon,1.5);
+    a[i+2*N]=-G*(r[i+2*N]-Rcm[2])*M/pow(RADIO + epsilon*epsilon,1.5);
     
   }
   

@@ -37,14 +37,25 @@ z2=[]
 
 
 
-for i in range(int(len(archivo1)-1)):
+for i in range(int(len(archivo2)-1)):
     a= archivo1[i].split()
     if(i==0):
         Radio=(float(a[0])**2+float(a[1])**2+float(a[2])**2)**0.5
     
     r1.append((float(a[0])**2+float(a[1])**2+float(a[2])**2)**0.5-Radio)
     r1.sort()
+    
 
-plt.hist(r1)
+h=plt.hist(r1)
 
+num=h[0]
+rs=h[1]
+
+print rs
+
+
+
+'''
+plt.plot(num,rs)
 plt.show()
+'''
