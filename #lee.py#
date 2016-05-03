@@ -32,12 +32,15 @@ x1=[]
 y1=[]
 z1=[]
 
+
 x2=[]
 y2=[]
 z2=[]
 
 Rmax=0
+
 contador=0
+
 for i in range(int(len(archivo1)-1)):
     a= archivo1[i].split()
     x1.append(a[0])

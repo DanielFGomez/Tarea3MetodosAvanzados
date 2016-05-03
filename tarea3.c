@@ -7,7 +7,7 @@
 
 void generar(int N,double R,double *r, double *v);
 
-void imprime(FILE *f,int N,double *r,double *v, int A);
+void imprime(FILE *f,int N,double *r,double *v, int A,double *Rcm);
 
 double calcular_masa(double radio2, double *r, double m, int N);
 
@@ -64,14 +64,18 @@ int main(int arg, char **argc){
   generar(N,R,r,v);
  
   FILE *f;
-  printf("\nGenerando datos iniciales\n");
-  imprime(f,N,r,v,0);
 
- 
+  printf("\nGenerando datos iniciales\n");
   
   calcular_cm(r, N, Rcm);
 
   printf("Rcm x=%f, y=%f, z=%f \n",Rcm[0],Rcm[1],Rcm[2]);
+
+  printf("AQUI\n");
+  
+  imprime(f,N,r,v,0,Rcm);
+
+ 
  
   printf("\n-----Comenzando leapfrog------\n");
 
@@ -85,8 +89,9 @@ int main(int arg, char **argc){
 
 
   printf("\nImprimiendo posiciones finales \n");
+
   
-  imprime(F,N,r,v,1);
+  imprime(F,N,r,v,1,Rcm);
 
   
  
@@ -130,7 +135,7 @@ void generar(int N,double R,double *r, double *v){
 }
 
 
-void imprime(FILE *f,int N,double *r,double *v, int A){
+void imprime(FILE *f,int N,double *r,double *v, int A,double *Rcm){
   if(A==0){
   f=fopen("Condiciones_iniciales.dat","w");
   }
@@ -138,7 +143,11 @@ void imprime(FILE *f,int N,double *r,double *v, int A){
   f=fopen("Estado_Final.dat","w");
   }
   int i;
+  double zero=0.0;
+  fprintf(f,"%f %f %f %f %f %f\n",Rcm[0],Rcm[1],Rcm[2], zero,zero ,zero );
+
   for(i=0;i<N;i++){
+
     fprintf(f,"%e %e %e %e %e %e\n",r[0+i],r[N+i],r[2*N+i],v[0+i],v[N+i],v[2*N+i]);	    
   }
 }
