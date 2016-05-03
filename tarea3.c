@@ -7,37 +7,48 @@
 
 void generar(int N,double R,double *r, double *v);
 
-void imprime(FILE *f,int N,double *r,double *v);
+void imprime(FILE *f,int N,double *r,double *v, int A);
 
 double calcular_masa(double radio2, double *r, double m, int N);
 
 void calcular_cm(double *r, int N, double* Rcm);
 
 void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon);
+
 void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, double *a, double dt, int N);
 
 int main(int arg, char **argc){
 
   int N=atoi(argc[1]);
-  double epsilon=atoi(argc[2]);
+  double epsilon=atof(argc[2]);
   int i; 
   double R=pow(N,1/3.0); //en Parsec
   double M=1.0; //masa solar
   double *Rcm;
-  double rho=N/(4*PI*pow(R,3)/3);
-  double rhoe=1/(4*PI*pow(epsilon,3)/3);
-  double T=1/pow(rho*G,0.5);
-  double dt=N/pow(rhoe*G,0.5);
+  double rho=N/(4.0*PI*pow(R,3.0)/3);
+  double rhoe=1.0/(4*PI*pow(epsilon,3.0)/3);
+  double T=1.0/pow(rho*G,0.5);
+  double dt=1.0/pow(rhoe*G,0.5);
+  int TIME=(int) 10*T/dt;
   
   
-  printf("\nParametro N=%d \n",N);
+  printf("\nNumero de cuerpos N=%d \n",N);
  
   printf("\nParamentros:\n \nG=%e \nM=%e \nR=%e\n",G,M,R);
   
-  printf("Generando datos iniciales\n");
- 
   printf("CTE gravitatoria %f \n",G);
+
+  printf("\nParametros Temporales:\n");
+
+  printf("\nTime=%f \n",T);
+
+  printf("epsilon=%f \n",epsilon);
   
+  printf("Time_step=%f \n",dt);
+
+  printf("Pasos de tiempos dados:=%d \n",TIME);
+  
+
   
   double *v;
   double *r;
@@ -49,25 +60,33 @@ int main(int arg, char **argc){
   a=malloc(sizeof(double)*N*3);
   Rcm=malloc(sizeof(double)*3);
 
+  
   generar(N,R,r,v);
  
   FILE *f;
+  printf("\nGenerando datos iniciales\n");
+  imprime(f,N,r,v,0);
 
-  imprime(f,N,r,v);
-
-  FILE *F;
+ 
   
   calcular_cm(r, N, Rcm);
-  printf("Rcm x= %f y= %f z= %f \n",Rcm[0],Rcm[1],Rcm[2]);
- 
 
-  for(i=1;i*dt<T;i++){
+  printf("Rcm x=%f, y=%f, z=%f \n",Rcm[0],Rcm[1],Rcm[2]);
+ 
+  printf("\n-----Comenzando leapfrog------\n");
+
+  for(i=1;i<TIME;i++){//*dt<T;i++){
     
     leap_frog_step(Rcm,M,epsilon,r, v, a, dt, N);
 
   }
   
+  FILE *F;
+
+
+  printf("\nImprimiendo posiciones finales \n");
   
+  imprime(F,N,r,v,1);
 
   
  
@@ -111,8 +130,13 @@ void generar(int N,double R,double *r, double *v){
 }
 
 
-void imprime(FILE *f,int N,double *r,double *v){
+void imprime(FILE *f,int N,double *r,double *v, int A){
+  if(A==0){
   f=fopen("Condiciones_iniciales.dat","w");
+  }
+ if(A==1){
+  f=fopen("Estado_Final.dat","w");
+  }
   int i;
   for(i=0;i<N;i++){
     fprintf(f,"%e %e %e %e %e %e\n",r[0+i],r[N+i],r[2*N+i],v[0+i],v[N+i],v[2*N+i]);	    
@@ -130,7 +154,7 @@ double calcular_masa(double radio2, double *r, double m, int N){
     rad2=r[i]*r[i] + r[i+N]*r[i+N] + r[i+2*N]*r[i+2*N];
     
     if(rad2<=radio2){
-      contador++;
+      contador+=1;
     }
 
   }
@@ -184,14 +208,15 @@ void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, do
   //PRIMERA ACELERACION
 
   calcular_a(a,r, Rcm, N, m,epsilon);
-//kick
-  for (i=0;1<N;i++){
+
+  //kick
+  for (i=0;i<N;i++){
     v[i]=v[i]+0.5*a[i]*dt;
     v[i+N]=v[i+N]+0.5*a[i+N]*dt;
     v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt;
   }
   //drift
- for (i=0;1<N;i++){
+ for (i=0;i<N;i++){
     r[i]=r[i]+v[i]*dt;
     r[i+N]=r[i+N]+v[i+N]*dt;
     r[i+2*N]=r[i+2*N]+v[i+2*N]*dt;
@@ -200,7 +225,7 @@ void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, do
 
  calcular_a(a,r, Rcm, N, m,epsilon);
 
- for (i=0;1<N;i++){
+ for (i=0;i<N;i++){
     v[i]=v[i]+0.5*a[i]*dt;
     v[i+N]=v[i+N]+0.5*a[i+N]*dt;
     v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt;
