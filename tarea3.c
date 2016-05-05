@@ -35,8 +35,6 @@ int main(int arg, char **argc){
   printf("\nNumero de cuerpos N=%d \n",N);
  
   printf("\nParamentros:\n \nG=%e \nM=%e \nR=%e\n",G,M,R);
-  
-  printf("CTE gravitatoria %f \n",G);
 
   printf("\nParametros Temporales:\n");
 
@@ -71,7 +69,6 @@ int main(int arg, char **argc){
 
   printf("Rcm x=%f, y=%f, z=%f \n",Rcm[0],Rcm[1],Rcm[2]);
 
-  printf("AQUI\n");
   
   imprime(f,N,r,v,0,Rcm);
 
@@ -117,7 +114,7 @@ void generar(int N,double R,double *r, double *v){
     //numeros random
     
     r1=R*pow(drand48(),1.0/3.0);
-    teta1=PI*drand48();
+    teta1=acos(2*(drand48()-0.5));
     phi1=2*PI*drand48();  
     
     //inicializando posiciones
