@@ -148,7 +148,7 @@ void imprime(FILE *f,int N,double *r,double *v, int A,double *Rcm,double m){
   
 
   for(i=0;i<N;i++){
-    R2=(r[0+i]*r[0+i]+r[N+i]*r[N+i]+r[2*N+i]*r[2*N+i]);
+    R2=((r[0+i]-Rcm[0])*(r[0+i]-Rcm[0])+(r[N+i]-Rcm[1])*(r[N+i]-Rcm[1])+(r[2*N+i]-Rcm[2])*(r[2*N+i]-Rcm[2]));
     M=calcular_masa(R2, r, m, N);
     V=(v[0+i]*v[0+i]+v[N+i]*v[N+i]+v[2*N+i]*v[2*N+i])*0.5*m;
     
