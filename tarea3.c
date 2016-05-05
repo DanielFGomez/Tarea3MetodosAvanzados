@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include "omp.h"
 #define PI 3.14159265359
 #define G 4.492E-3
 
@@ -150,6 +151,7 @@ void imprime(FILE *f,int N,double *r,double *v, int A,double *Rcm){
 
     fprintf(f,"%e %e %e %e %e %e\n",r[0+i],r[N+i],r[2*N+i],v[0+i],v[N+i],v[2*N+i]);	    
   }
+  fclose(f);
 }
 
 double calcular_masa(double radio2, double *r, double m, int N){
@@ -196,6 +198,7 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
   double radio2=0;
   double RADIO;
 
+#pragma omp parallel for private(radio2),private(M),private(RADIO)
   for(i=0;i<N;i++){
 
     radio2=r[i]*r[i]+r[i+N]*r[i+N]+r[i+2*N]*r[i+2*N];
