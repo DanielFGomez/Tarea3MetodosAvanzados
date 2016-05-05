@@ -46,16 +46,24 @@ for i in range(int(len(archivo2)-1)):
     r1.sort()
     
 
-h=plt.hist(r1)
-
-num=h[0]
-rs=h[1]
-
-print rs
+h=plt.hist(r1,bins=20)
+plt.close()
 
 
+num=np.zeros(len(h[0])-1)
+rs=np.zeros(len(h[0])-1)
 
-'''
-plt.plot(num,rs)
+
+suma=0
+
+for i in range(len(h[0])-1):
+    num[i]=np.log(h[0][i+1])
+    suma+=h[1][i+1]
+    rs[i]=np.log(suma)
+
+
+densidad=num-2*rs
+
+plt.scatter(rs,densidad)
 plt.show()
-'''
+
