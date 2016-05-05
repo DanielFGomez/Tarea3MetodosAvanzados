@@ -40,10 +40,13 @@ z2=[]
 for i in range(int(len(archivo2)-1)):
     a= archivo1[i].split()
     if(i==0):
-        Radio=(float(a[0])**2+float(a[1])**2+float(a[2])**2)**0.5
+        Rcmx=float(a[0])
+        Rcmy=float(a[1])
+        Rcmz=float(a[2])
     
-    r1.append((float(a[0])**2+float(a[1])**2+float(a[2])**2)**0.5-Radio)
-    r1.sort()
+    r1.append(((float(a[0])-Rcmx)**2+(float(a[1])-Rcmy)**2+(float(a[2])-Rcmz)**2)**0.5)
+
+r1.sort()
     
 
 h=plt.hist(r1,bins=20)
@@ -53,13 +56,15 @@ plt.close()
 num=np.zeros(len(h[0])-1)
 rs=np.zeros(len(h[0])-1)
 
-
 suma=0
 
 for i in range(len(h[0])-1):
-    num[i]=np.log(h[0][i+1])
-    suma+=h[1][i+1]
-    rs[i]=np.log(suma)
+    rs[i]=np.log(h[0][i+1])
+    suma=h[1][i+1]
+    num[i]=np.log(suma)
+
+print "num=",num
+print "rs=",rs
 
 
 densidad=num-2*rs
