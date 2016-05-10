@@ -85,7 +85,7 @@ int main(int arg, char **argc){
   for(i=1;i<TIME;i++){//*dt<T;i++){
     
     leap_frog_step(Rcm,M,epsilon,r, v, a, dt, N);
-
+    calcular_cm(r,N,Rcm);
   }
   
   FILE *F;
