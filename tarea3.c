@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-//#include "omp.h"
+#include "omp.h"
 #define PI 3.14159265359
 #define G 4.492E-3
 
@@ -20,6 +20,11 @@ void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, do
 
 int main(int arg, char **argc){
 
+  if(arg<3){
+    printf("Hace falta introducir los parametros N (numero de puntos) y epsilon (factor de suavizado)\n");
+    exit(1);
+  }
+      
   int N=atoi(argc[1]);
   double epsilon=atof(argc[2]);
   int i; 
@@ -203,7 +208,7 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
   double radio2=0;
   double RADIO;
 
-  //#pragma omp parallel for private(radio2),private(M),private(RADIO)
+ #pragma omp parallel for private(radio2),private(M),private(RADIO)
 
   for(i=0;i<N;i++){
 
