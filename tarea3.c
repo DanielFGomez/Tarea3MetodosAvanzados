@@ -3,7 +3,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "omp.h"
+//#include "omp.h"
 #define PI 3.14159265359
 #define G 4.492E-3
 
@@ -19,30 +19,10 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
 
 void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, double *a, double dt, int N);
 
-double calcular_energia_potencial(double *Rcm, double m, double *r, int N, double epsilon){
-  double R,M,V;
-  int i;
-  V=0;
-  
-  for (i=0;i<N;i++){
-    R=sqrt(((r[0+i]-Rcm[0])*(r[0+i]-Rcm[0])+(r[N+i]-Rcm[1])*(r[N+i]-Rcm[1])+(r[2*N+i]-Rcm[2])*(r[2*N+i]-Rcm[2])));
-    M=calcular_masa(R*R, r, m, N,Rcm);
+double calcular_energia_potencial(double *Rcm, double m, double *r, int N, double epsilon);
 
-    V-=G*M*m/(R+epsilon);
-  }
-  return V;
-}
-  
-double calcular_energia_cinetica(double *v, int N,double m){
-  double K=0;
-  int i;
-  for (i=0;i<N;i++){
-    K+=(v[0+i]*v[0+i]+v[N+i]*v[N+i]+v[2*N+i]*v[2*N+i])*0.5*m;
-  }
-  return K;
-}
-				   
- 
+double calcular_energia_cinetica(double *v, int N,double m);
+
 
 
 int main(int arg, char **argc){
@@ -246,7 +226,7 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
   double RADIO2=0;
   double RADIO;
 
- #pragma omp parallel for private(RADIO2),private(M),private(RADIO)
+  //#pragma omp parallel for private(RADIO2),private(M),private(RADIO)
 
   for(i=0;i<N;i++){
 
@@ -272,6 +252,7 @@ void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, do
 
   //kick
   for (i=0;i<N;i++){
+
     v[i]=v[i]+0.5*a[i]*dt;
     v[i+N]=v[i+N]+0.5*a[i+N]*dt;
     v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt;
@@ -292,3 +273,27 @@ void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, do
   }
 }
   
+double calcular_energia_potencial(double *Rcm, double m, double *r, int N, double epsilon){
+  double R,M,V;
+  int i;
+  V=0;
+  
+  for (i=0;i<N;i++){
+    R=sqrt(((r[0+i]-Rcm[0])*(r[0+i]-Rcm[0])+(r[N+i]-Rcm[1])*(r[N+i]-Rcm[1])+(r[2*N+i]-Rcm[2])*(r[2*N+i]-Rcm[2])));
+    M=calcular_masa(R*R, r, m, N,Rcm);
+
+    V-=G*M*m/(R+epsilon);
+  }
+  return V;
+}
+  
+double calcular_energia_cinetica(double *v, int N,double m){
+  double K=0;
+  int i;
+  for (i=0;i<N;i++){
+    K+=(v[0+i]*v[0+i]+v[N+i]*v[N+i]+v[2*N+i]*v[2*N+i])*0.5*m;
+  }
+  return K;
+}
+				   
+ 
