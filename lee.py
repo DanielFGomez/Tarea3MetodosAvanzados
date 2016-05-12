@@ -42,39 +42,56 @@ for i in range((len(archivo1)-1)):
 r1.sort()
     
 
-h=plt.hist(r1,bins=30)
+h=plt.hist(r1,bins=20)
+plt.title("Histograma en R")
 plt.show()
 
 
-num=np.zeros(len(h[0])-1)
-rs=np.zeros(len(h[0])-1)
-dens=np.zeros(len(h[0])-1)
-radio=np.zeros(len(h[0])-1)
-suma=0
+num=np.zeros(len(h[0])-1)#numero de particulas en cada bin
 
-print "h[0]",h[0],"\n"
-print "h[1]",h[1],"\n"
+rs=np.zeros(len(h[0])-1)#radio al bin en logaritmo
 
-for i in range(len(h[0])-1):
+dens=np.zeros(len(h[0])-1)#densidad
+
+radio=np.zeros(len(h[0])-1)#radio
+
+print h[1][-1],  h[0][-1]
+
+for i in range(1,len(h[0])-1):
 
     rs[i]=np.log(h[1][i+1])
+
+    if(h[0][i+1]==0):
+        print h[0][i+1],i
+
+    num[i]=np.log(h[0][i+1]+1)
     
-    num[i]=np.log(h[0][i+1])
     
     dens[i]=h[0][i]/h[1][i]**2
 
     radio[i]=h[1][i]
 
 
-densidad=num-2*rs-np.log(4*np.pi)-np.log(h[1][1]-h[1][0])
+densidad=num-2*rs-np.log(4*np.pi)-np.log(h[1][1]-h[1][0])#log de la densidad
+
+f=open("Log_vs_Log.dat","w")
+
+for i in range(len(densidad)):
+   f.write(densidad[i])
+   f.write(rs[i])
+
+
 
 print "densidad\n\n\n", densidad 
 
 plt.plot(radio,dens,label="Densidad")
+plt.title("rho vs r ")
 plt.legend()
+
 plt.show()
 
 plt.scatter(rs,densidad,label="$Log(\rho)(N,r)$")
+plt.title(" log(rho) vs log(r) ")
 plt.legend()
 plt.show()
 
