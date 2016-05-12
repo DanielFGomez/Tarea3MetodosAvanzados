@@ -19,13 +19,30 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
 
 void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, double *a, double dt, int N);
 
-void calcular_energia(double *Rcm, double m, double *r, double *v){
-  double R2,M,V;
+double calcular_energia_potencial(double *Rcm, double m, double *r, int N){
+  double R,M,V;
+  int i;
+  V=0;
+  
+  for (i=0;i<N;i++){
+    R=sqrt(((r[0+i]-Rcm[0])*(r[0+i]-Rcm[0])+(r[N+i]-Rcm[1])*(r[N+i]-Rcm[1])+(r[2*N+i]-Rcm[2])*(r[2*N+i]-Rcm[2])));
+    M=calcular_masa(R2, r, m, N);
 
-  R2=((r[0+i]-Rcm[0])*(r[0+i]-Rcm[0])+(r[N+i]-Rcm[1])*(r[N+i]-Rcm[1])+(r[2*N+i]-Rcm[2])*(r[2*N+i]-Rcm[2]));
-  M=calcular_masa(R2, r, m, N);
-  V=(v[0+i]*v[0+i]+v[N+i]*v[N+i]+v[2*N+i]*v[2*N+i])*0.5*m;
-    
+    V-=G*M*m/(R+epsilon,0.5);
+  }
+  return V;
+}
+  
+double calcular_energia_cinetica(double *v, double N){
+  double K=0;
+  int i;
+  for (i=0;i<N;i++){
+    K+=(v[0+i]*v[0+i]+v[N+i]*v[N+i]+v[2*N+i]*v[2*N+i])*0.5*m;
+  }
+  return K;
+}
+				   
+ 
 }
 
 int main(int arg, char **argc){
@@ -45,6 +62,11 @@ int main(int arg, char **argc){
   double rhoe=N/(4.0*PI*pow(epsilon,3.0)/3.0); //faltaba N
   double T=1.0/pow(rho*G,0.5);
   double dt=1.0/pow(rhoe*G,0.5);
+  double *E,*V,*K;
+
+  
+  
+  
   int TIME=(int) 10*T/dt;
   
   
@@ -63,7 +85,6 @@ int main(int arg, char **argc){
   printf("Pasos de tiempos dados:=%d \n",TIME);
   
 
-  
   double *v;
   double *r;
   double *a;
@@ -73,6 +94,11 @@ int main(int arg, char **argc){
   v=malloc(sizeof(double)*N*3);
   a=malloc(sizeof(double)*N*3);
   Rcm=malloc(sizeof(double)*3);
+
+  
+  K=malloc(sizeof(double)*TIME);
+  V=malloc(sizeof(double)*TIME);
+  E=malloc(sizeof(double)*TIME);
 
   
   generar(N,R,r,v);
@@ -176,7 +202,7 @@ void imprime(FILE *f,int N,double *r,double *v, int A,double *Rcm,double m){
 }
 
 
-double calcular_masa(double radio2, double *r, double m, int N){
+double calcular_masa(double radio2, double *r, double m, int N, double *Rcm){
   
   int i;
   int contador=0;
@@ -184,9 +210,9 @@ double calcular_masa(double radio2, double *r, double m, int N){
 
   for(i=0;i<N;i++){
 
-    rad2=r[i]*r[i] + r[i+N]*r[i+N] + r[i+2*N]*r[i+2*N];
+    rad2=((r[i]-Rcm[0])*(r[i]-Rcm[0])+(r[i+N]-Rcm[1])*(r[i+N]-Rcm[1])+(r[i+2*N]-Rcm[2])*(r[i+2*N]-Rcm[2]));
     
-    if(rad2<=radio2){
+    if(rad2<radio2){
       contador+=1;
     }
 
@@ -217,22 +243,22 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
   
   double M=0;//calcular_masa()
   int i=0;
-  double radio2=0;
+  double RADIO2=0;
   double RADIO;
 
  #pragma omp parallel for private(radio2),private(M),private(RADIO)
 
   for(i=0;i<N;i++){
 
-    radio2=r[i]*r[i]+r[i+N]*r[i+N]+r[i+2*N]*r[i+2*N];
-
-    M=calcular_masa(radio2,r,m,N);
-
-    RADIO=(r[i]-Rcm[0])*(r[i]-Rcm[0])+(r[i+N]-Rcm[1])*(r[i+N]-Rcm[1])+(r[i+2*N]-Rcm[2])*(r[i+2*N]-Rcm[2]);
+   
+    RADIO2=((r[i]-Rcm[0])*(r[i]-Rcm[0])+(r[i+N]-Rcm[1])*(r[i+N]-Rcm[1])+(r[i+2*N]-Rcm[2])*(r[i+2*N]-Rcm[2]));
     
-    a[i]=-G*(r[i]-Rcm[0])*M/pow(RADIO + epsilon*epsilon,1.5);
-    a[i+N]=-G*(r[i+N]-Rcm[1])*M/pow(RADIO + epsilon*epsilon,1.5);
-    a[i+2*N]=-G*(r[i+2*N]-Rcm[2])*M/pow(RADIO + epsilon*epsilon,1.5);
+    M=calcular_masa(RADIO2,r,m,N);
+    RADIO=sqrt(RADIO2);
+       
+    a[i]=-G*(r[i]-Rcm[0])*M/pow(RADIO + epsilon,3);
+    a[i+N]=-G*(r[i+N]-Rcm[1])*M/pow(RADIO + epsilon,3);
+    a[i+2*N]=-G*(r[i+2*N]-Rcm[2])*M/pow(RADIO + epsilon,3);
     
   }
   
@@ -249,9 +275,8 @@ void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, do
     v[i]=v[i]+0.5*a[i]*dt;
     v[i+N]=v[i+N]+0.5*a[i+N]*dt;
     v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt;
-  }
-  //drift
- for (i=0;i<N;i++){
+
+  //Drift
     r[i]=r[i]+v[i]*dt;
     r[i+N]=r[i+N]+v[i+N]*dt;
     r[i+2*N]=r[i+2*N]+v[i+2*N]*dt;
