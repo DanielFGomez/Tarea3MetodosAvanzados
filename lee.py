@@ -77,10 +77,9 @@ densidad=num-2*rs-np.log(4*np.pi)-np.log(h[1][1]-h[1][0])#log de la densidad
 f=open("Log_vs_Log.dat","w")
 
 for i in range(len(densidad)):
-   f.write(densidad[i])
-   f.write(rs[i])
+   f.write(str(rs[i])+" "+str(densidad[i])+"\n")
 
-
+f.close()
 
 print "densidad\n\n\n", densidad 
 
@@ -90,7 +89,7 @@ plt.legend()
 
 plt.show()
 
-plt.scatter(rs,densidad,label="$Log(\rho)(N,r)$")
+plt.scatter(rs,densidad,label="Log(\rho)(N,r)")
 plt.title(" log(rho) vs log(r) ")
 plt.legend()
 plt.show()
