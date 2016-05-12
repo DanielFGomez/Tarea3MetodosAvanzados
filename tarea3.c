@@ -42,7 +42,7 @@ int main(int arg, char **argc){
   double M=1.0; //masa solar
   double *Rcm;
   double rho=N/(4.0*PI*pow(R,3.0)/3);
-  double rhoe=1.0/(4*PI*pow(epsilon,3.0)/3);
+  double rhoe=N/(4.0*PI*pow(epsilon,3.0)/3.0); //faltaba N
   double T=1.0/pow(rho*G,0.5);
   double dt=1.0/pow(rhoe*G,0.5);
   int TIME=(int) 10*T/dt;
@@ -164,11 +164,13 @@ void imprime(FILE *f,int N,double *r,double *v, int A,double *Rcm,double m){
 
   for(i=0;i<N;i++){
 
+
     R2=((r[0+i]-Rcm[0])*(r[0+i]-Rcm[0])+(r[N+i]-Rcm[1])*(r[N+i]-Rcm[1])+(r[2*N+i]-Rcm[2])*(r[2*N+i]-Rcm[2]));
+
     M=calcular_masa(R2, r, m, N);
     V=(v[0+i]*v[0+i]+v[N+i]*v[N+i]+v[2*N+i]*v[2*N+i])*0.5*m;
     
-    fprintf(f,"%e %e %e %e %e %e %e %e\n",r[0+i],r[N+i],r[2*N+i],v[0+i],v[N+i],v[2*N+i],V, G*M/sqrt(R2));	    
+    fprintf(f,"%e %e %e %e %e %e %e %e\n",r[0+i],r[N+i],r[2*N+i],v[0+i],v[N+i],v[2*N+i],V,-G*M/sqrt(R2));// - un menos	    
   }
   fclose(f);
 }
@@ -178,7 +180,7 @@ double calcular_masa(double radio2, double *r, double m, int N){
   
   int i;
   int contador=0;
-  double rad2;
+  double rad2=0;
 
   for(i=0;i<N;i++){
 
