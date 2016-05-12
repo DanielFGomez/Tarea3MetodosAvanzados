@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+
 #include "omp.h"
 #define PI 3.14159265359
 #define G 4.492E-3
@@ -17,6 +18,15 @@ void calcular_cm(double *r, int N, double* Rcm);
 void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon);
 
 void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, double *a, double dt, int N);
+
+void calcular_energia(double *Rcm, double m, double *r, double *v){
+  double R2,M,V;
+
+  R2=((r[0+i]-Rcm[0])*(r[0+i]-Rcm[0])+(r[N+i]-Rcm[1])*(r[N+i]-Rcm[1])+(r[2*N+i]-Rcm[2])*(r[2*N+i]-Rcm[2]));
+  M=calcular_masa(R2, r, m, N);
+  V=(v[0+i]*v[0+i]+v[N+i]*v[N+i]+v[2*N+i]*v[2*N+i])*0.5*m;
+    
+}
 
 int main(int arg, char **argc){
 
