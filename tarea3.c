@@ -3,7 +3,7 @@
 #include <math.h>
 #include <time.h>
 
-//#include "omp.h"
+#include "omp.h"
 #define PI 3.14159265359
 #define G 4.492E-3
 
@@ -226,7 +226,7 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
   double RADIO2=0;
   double RADIO;
 
-  //#pragma omp parallel for private(RADIO2),private(M),private(RADIO)
+  #pragma omp parallel for private(RADIO2),private(M),private(RADIO)
 
   for(i=0;i<N;i++){
 
