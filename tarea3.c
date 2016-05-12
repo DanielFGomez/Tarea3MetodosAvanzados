@@ -23,6 +23,8 @@ double calcular_energia_potencial(double *Rcm, double m, double *r, int N, doubl
 
 double calcular_energia_cinetica(double *v, int N,double m);
 
+void imprime_energias(FILE *f,double *V, double *K, double *E, double N);
+
 
 
 int main(int arg, char **argc){
@@ -48,7 +50,7 @@ int main(int arg, char **argc){
   
   
   int TIME=(int) 10*T/dt;
-  
+  TIME=200;//Prueba
   
   printf("\nNumero de cuerpos N=%d \n",N);
  
@@ -102,6 +104,9 @@ int main(int arg, char **argc){
     
     leap_frog_step(Rcm,M,epsilon,r, v, a, dt, N);
     calcular_cm(r,N,Rcm);
+    V[i]=calcular_energia_potencial(Rcm, M,r, N,epsilon);
+    K[i]=calcular_energia_cinetica(v,N,M);
+    E[i]=V[i]+K[i];
   }
   
   FILE *F;
@@ -112,6 +117,10 @@ int main(int arg, char **argc){
   
   imprime(F,N,r,v,1,Rcm,M);
 
+  printf("\nImprimiendo energias");
+
+  FILE *F_energias;
+  imprime_energias(F_energias,V,K,E,TIME);
   
  
    
@@ -177,6 +186,18 @@ void imprime(FILE *f,int N,double *r,double *v, int A,double *Rcm,double m){
     V=(v[0+i]*v[0+i]+v[N+i]*v[N+i]+v[2*N+i]*v[2*N+i])*0.5*m;
     
     fprintf(f,"%e %e %e %e %e %e %e %e\n",r[0+i],r[N+i],r[2*N+i],v[0+i],v[N+i],v[2*N+i],V,-G*M/sqrt(R2));// - un menos	    
+  }
+  fclose(f);
+}
+
+void imprime_energias(FILE *f,double *V, double *K, double *E, double N){
+  
+  f=fopen("Energias.dat","w");
+  
+  int i;
+
+  for(i=0;i<N;i++){
+    fprintf(f,"%f %f %f\n",V[i],K[i],E[i]);
   }
   fclose(f);
 }
@@ -247,7 +268,7 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
 void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, double *a, double dt, int N){
   int i;
   //PRIMERA ACELERACION
-
+  
   calcular_a(a,r, Rcm, N, m,epsilon);
 
   //kick
@@ -271,6 +292,9 @@ void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, do
     v[i+N]=v[i+N]+0.5*a[i+N]*dt;
     v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt;
   }
+
+ //Energias
+ 
 }
   
 double calcular_energia_potencial(double *Rcm, double m, double *r, int N, double epsilon){
