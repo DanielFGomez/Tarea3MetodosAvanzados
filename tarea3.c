@@ -50,7 +50,7 @@ int main(int arg, char **argc){
   
   
   int TIME=(int) 10*T/dt;
-  TIME=200;//Prueba
+ 
   
   printf("\nNumero de cuerpos N=%d \n",N);
  
