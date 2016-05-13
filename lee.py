@@ -21,7 +21,7 @@ try:
     archivo1=open(lectura1).read().split("\n")
 except IOError:
     
-   print "Error: el archivo "+lectura+ " no existe"
+   print "Error: el archivo "+lectura1+ " no existe"
    exit()
 
 

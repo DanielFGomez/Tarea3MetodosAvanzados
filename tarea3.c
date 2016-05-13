@@ -104,9 +104,12 @@ int main(int arg, char **argc){
     
     leap_frog_step(Rcm,M,epsilon,r, v, a, dt, N);
     calcular_cm(r,N,Rcm);
+    //No se requiere calcular la energia en cada step para la prueba de velocidad pero se deja comentado porque puede serr util para debuggear el codigo
+    /*
     V[i]=calcular_energia_potencial(Rcm, M,r, N,epsilon);
     K[i]=calcular_energia_cinetica(v,N,M);
     E[i]=V[i]+K[i];
+    */
   }
   
   FILE *F;
@@ -117,11 +120,11 @@ int main(int arg, char **argc){
   
   imprime(F,N,r,v,1,Rcm,M);
 
+  /*
   printf("\nImprimiendo energias");
-
   FILE *F_energias;
   imprime_energias(F_energias,V,K,E,TIME);
-  
+  */
  
    
 
@@ -233,7 +236,7 @@ void calcular_cm(double *r, int N,double *Rcm){
     y+=r[i+N] ;
     z+=r[i+2*N] ;
    
-}
+  }
   Rcm[0]=x/N;
   Rcm[1]=y/N;
   Rcm[2]=z/N;
@@ -248,7 +251,6 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
   double RADIO;
 
   #pragma omp parallel for private(RADIO2),private(M),private(RADIO)
-
   for(i=0;i<N;i++){
 
    
@@ -267,33 +269,69 @@ void calcular_a(double *a,double *r, double *Rcm, int N, double m,double epsilon
 
 void leap_frog_step(double *Rcm,double m,double epsilon,double *r, double *v, double *a, double dt, int N){
   int i;
-  //PRIMERA ACELERACION
   
-  calcular_a(a,r, Rcm, N, m,epsilon);
+  double a0;
+  a0=-pow(2,1/3)/(2-pow(2,1/3));
+  double a1;
+  a1=1/(2-pow(2,1/3));
 
-  //kick
+  #pragma omp parallel for
   for (i=0;i<N;i++){
-
-    v[i]=v[i]+0.5*a[i]*dt;
-    v[i+N]=v[i+N]+0.5*a[i+N]*dt;
-    v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt;
-
-  //Drift
-    r[i]=r[i]+v[i]*dt;
-    r[i+N]=r[i+N]+v[i+N]*dt;
-    r[i+2*N]=r[i+2*N]+v[i+2*N]*dt;
+    //KICK 1.1
+    v[i]=v[i]+0.5*a[i]*dt*a0;
+    v[i+N]=v[i+N]+0.5*a[i+N]*dt*a0;
+    v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt*a0;
+    //DRIFT 1
+    r[i]=r[i]+v[i]*dt*a0;
+    r[i+N]=r[i+N]+v[i+N]*dt*a0;
+    r[i+2*N]=r[i+2*N]+v[i+2*N]*dt*a0;
   }
-  //kick
-
- calcular_a(a,r, Rcm, N, m,epsilon);
-
- for (i=0;i<N;i++){
-    v[i]=v[i]+0.5*a[i]*dt;
-    v[i+N]=v[i+N]+0.5*a[i+N]*dt;
-    v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt;
+  
+    calcular_a(a,r, Rcm, N, m,epsilon);
+    //KICK 1.2
+    #pragma omp parallel for
+    for (i=0;i<N;i++){
+      v[i]=v[i]+0.5*a[i]*dt*a0;
+      v[i+N]=v[i+N]+0.5*a[i+N]*dt*a0;
+      v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt*a0;
+    //KICK 2.1
+      v[i]=v[i]+0.5*a[i]*dt*a1;
+      v[i+N]=v[i+N]+0.5*a[i+N]*dt*a1;
+      v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt*a1;
+      //DRIFT 2
+      r[i]=r[i]+v[i]*dt*a1;
+      r[i+N]=r[i+N]+v[i+N]*dt*a1;
+      r[i+2*N]=r[i+2*N]+v[i+2*N]*dt*a1;
+      
   }
 
- //Energias
+    calcular_a(a,r,Rcm,N,m,epsilon);
+#pragma omp parallel for
+    for (i=0;i<N;i++){
+      //KICK 2.2
+      v[i]=v[i]+0.5*a[i]*dt*a1;
+      v[i+N]=v[i+N]+0.5*a[i+N]*dt*a1;
+      v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt*a1;
+
+      //KICK 3.1
+      v[i]=v[i]+0.5*a[i]*dt*a0;
+      v[i+N]=v[i+N]+0.5*a[i+N]*dt*a0;
+      v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt*a0;
+
+      //DRIFT 3
+      r[i]=r[i]+v[i]*dt*a0;
+      r[i+N]=r[i+N]+v[i+N]*dt*a0;
+      r[i+2*N]=r[i+2*N]+v[i+2*N]*dt*a0;
+    }
+    
+    calcular_a(a,r,Rcm,N,m,epsilon);
+
+     for (i=0;i<N;i++){
+      //KICK 2.2
+      v[i]=v[i]+0.5*a[i]*dt*a0;
+      v[i+N]=v[i+N]+0.5*a[i+N]*dt*a0;
+      v[i+2*N]=v[i+2*N]+0.5*a[i+2*N]*dt*a0;
+     }
  
 }
   

@@ -2,8 +2,8 @@
 
 evolve:
 	#gcc-5 tarea3.c -fopenmp	#para mac 
-	cc  tarea3.c -lm -fopenmp
-	time ./a.out 100 0.1
-	python lee.py Estado_final.dat
+	gcc  tarea3.c -lm -fopenmp -o evolve
+	time ./evolve 500 0.1
+	python lee.py "Estado_Final.dat"
 clean: 
 	rm *.dat
